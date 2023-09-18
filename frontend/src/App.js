@@ -12,6 +12,7 @@ import {NoPage} from "./NoPage"
 const App = () => {
     const [username, setUsername] = useState(null)
 
+    // Check authentication
     useEffect(() => {
         fetch(WHOAMI_PATH)
             .then(response => {
