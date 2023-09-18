@@ -26,10 +26,20 @@ const formatResourceDescription = (res) => ([
     },
 ])
 
+const HHMMSS_LENGTH = "HH:MM:SS".length
+
+const timestampAtOnFormatter = (t) => {
+    if (t?.length > HHMMSS_LENGTH) {
+        return `on ${t}`
+    }
+
+    return `at ${t}`
+}
+
 const formatTimeline = (data) => data.map(
     timelineItem => ({
         color: 'gray',
-        children: `Down ${timelineItem.timestamp}`,
+        children: `Down ${timestampAtOnFormatter(timelineItem.timestamp)}`,
     })
 )
 
