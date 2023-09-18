@@ -28,12 +28,20 @@ class ResourceDetails(
     serializer_class = serializers.ResourceSerializer
 
 
-class ResourceTimelineView(generics.ListCreateAPIView):
+class ResourceTimelineView(generics.ListAPIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.TimelineSerializer
 
     def get_queryset(self):
+        resource_id = self.kwargs['resource_id']
         user = self.request.user
-        # return models.Timeline.objects.filter(resource__owner=user)
-        return models.Timeline.objects.all()
+
+        return (
+            models.Timeline.objects
+            .filter(
+                resource__owner=user,
+                resource__id=resource_id,
+            )
+            .order_by('-created')
+        )

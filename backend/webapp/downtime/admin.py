@@ -1,5 +1,6 @@
 from django.contrib import admin
 
-from .models import Resource
+from . import models
 
-admin.site.register(Resource)
+admin.site.register(models.Resource)
+admin.site.register(models.Timeline)

@@ -1,4 +1,4 @@
-export const RESOURCES_PATH = "/api/downtime/resources/"
+export const RESOURCES_PATH = "/api/downtime/resources"
 export const WHOAMI_PATH = "/api/whoami/"
 export const CSRF_PATH = "/api/csrf/"
 export const LOGIN_PATH = "/api/login"
