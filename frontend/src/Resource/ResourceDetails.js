@@ -26,7 +26,7 @@ const formatResourceDescription = (res) => ([
     },
 ])
 
-const formatTimeline = (data) => data.results?.map(
+const formatTimeline = (data) => data.map(
     timelineItem => ({
         color: 'gray',
         children: `Down ${timelineItem.timestamp}`,
@@ -40,6 +40,8 @@ export const ResourceDetails = () => {
 
     const [resource, setResource] = useState(null)
     const [timeline, setTimeline] = useState(null)
+    const [nextTimelineRef, setNextTimelineRef] = useState(null)
+    const [nextTimelineLoading, setNextTimelineLoading] = useState(false)
     const [resourceLoading, setResourceLoading] = useState(true)
     const [timelineLoading, setTimelineLoading] = useState(true)
 
@@ -59,7 +61,10 @@ export const ResourceDetails = () => {
                     return response.json()
                 }
             })
-            .then(data => setTimeline(data))
+            .then(data => {
+                setNextTimelineRef(data?.next)
+                setTimeline(data?.results)
+            })
     }, [resourceId])
 
     const showDeleteConfirm = () => {
@@ -90,6 +95,22 @@ export const ResourceDetails = () => {
             onCancel() {
             },
         });
+    }
+
+    const loadMoreTimelineData = () => {
+        setNextTimelineLoading(true)
+
+        fetch(nextTimelineRef)
+            .then(response => {
+                setNextTimelineLoading(false)
+                if (response.status === 200) {
+                    return response.json()
+                }
+            })
+            .then(data => {
+                setNextTimelineRef(data.next)
+                setTimeline([...timeline, ...data.results])
+            })
     }
 
     return (
@@ -126,15 +147,26 @@ export const ResourceDetails = () => {
             {
                 timelineLoading ?
                     <p>Loading timeline...</p> :
-                    timeline?.results?.length ?
-                        <Row>
-                            <Col span={12}>
-                                <Timeline
-                                    items={formatTimeline(timeline)}
-                                />
-                            </Col>
-                            <Col span={12}></Col>
-                        </Row> :
+                    timeline?.length ?
+                        <>
+                            <Row>
+                                <Col span={12}>
+                                    <Timeline
+                                        items={formatTimeline(timeline)}
+                                    />
+                                </Col>
+                                <Col span={12}></Col>
+                            </Row>
+                            {
+                                nextTimelineRef &&
+                                    <Button
+                                        loading={nextTimelineLoading}
+                                        onClick={loadMoreTimelineData}
+                                    >
+                                        Load more
+                                    </Button>
+                            }
+                        </> :
                         <p>No timeline data.</p>
             }
         </>
