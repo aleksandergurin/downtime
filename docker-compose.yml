@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+
+  db:
+    image: postgres:14
+    env_file:
+      - backend/env/postgres.env
+
+  backend:
+    platform: linux/amd64
+    build: backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/webapp:/opt/app/webapp
+      - ./backend/static:/opt/app/static
+      - ./backend/templates:/opt/app/templates
+    env_file:
+      - backend/env/postgres.env
+    depends_on:
+      db:
+        condition: service_started
+
+  frontend:
+    build: frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/opt/app/src
+      - ./frontend/public:/opt/app/public
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+      - frontend
